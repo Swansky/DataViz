@@ -107,7 +107,7 @@ async function createMainGraph(data) {
 
 
     const svg = d3.create("svg")
-        .attr("width", width + 200)
+        .attr("width", width +120)
         .attr("height", height);
 
     svg.append("g")
@@ -215,7 +215,7 @@ async function createCarConsoGraph(initData) {
 
     const svg = d3.select("#containerCarGraph")
         .append("svg")
-        .attr("width", 1100)
+        .attr("width", 900)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
@@ -297,12 +297,12 @@ async function createCarConsoGraph(initData) {
 
 async function createChargingStationsGraph(dataChargingStations) {
 
-    // set the dimensions and margins of the graph
+
     const margin = { top: 50, right: 30, bottom: 40, left: 150 },
         width = 800 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
-    // append the svg object to the body of the page
+
     const svg = d3.select("#containerChargingStationsGraph")
         .append("svg")
         .attr("width", width + margin.left + margin.right + 200)
@@ -310,7 +310,7 @@ async function createChargingStationsGraph(dataChargingStations) {
         .append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    // Add X axis for dates
+
     const x = d3.scaleUtc()
         .domain(d3.extent(dataChargingStations, function (d) { return d.DT_MESURE; }))
         .range([0, width]);
@@ -323,14 +323,14 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("transform", "translate(-10,0)rotate(-45)")
         .style("text-anchor", "start");
 
-    // Y axis for prices
+
     const y = d3.scaleLinear()
         .domain([0, d3.max(dataChargingStations, function (d) { return d.PTTC_HFA; })])
         .range([height, 0])
     svg.append("g")
         .call(d3.axisLeft(y))
 
-    // Bars add color and value on bars
+
     svg.selectAll("myRect")
         .data(dataChargingStations)
         .join("rect")
@@ -340,7 +340,7 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("height", (d) => height - y(d.PTTC_HFA))
         .attr("fill", (d) => d.TYPE_RECHARGE === "Rapide" ? "#82CEEB" : (d.TYPE_RECHARGE === "Ultra-Rapide" ? "#8489EB" : "#84EBC4"));
 
-    // Add text inside bars
+
     svg.append("g")
         .attr("fill", "white")
         .attr("text-anchor", "middle")
@@ -353,12 +353,12 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("dx", -4)
         .text((d) => d.PTTC_HFA + " € / kWh");
 
-    // rotate each text based on ist actual location
+
     svg.selectAll("text").attr("transform", function(d) {
         return "rotate(-90 " + this.getAttribute("x") + "," + this.getAttribute("y") + ")";
     });
 
-    // Add a legend
+
     const legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", "translate(700, 100)");
@@ -389,14 +389,14 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("y", 75)
         .text("Normale");
 
-    // add title
+/*
     svg.append("text")
         .attr("x", (width / 2))
         .attr("y", 0 - (margin.top / 2) - 10)
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
         .style("text-decoration", "underline")
-        .text("Prix moyen de l'électricité des stations de recharge publiques");
+        .text("Prix moyen de l'électricité des stations de recharge publiques"); */
 
 }
 main().catch(console.error);
