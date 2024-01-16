@@ -7,21 +7,16 @@
     <script src="https://d3js.org/d3.v6.js"></script>
 </head>
 <body>
-<div id="containerMainGraph"></div>
-
-<div>
-    <label>
-        Type Véhicule :
-        <select id="carSelector" name="type" id="type">
-        </select>
-    </label>
-    <label>
-        Distance en Km :
-        <input name="distance" type="number" value="100">
-    </label>
-    <button onclick="createMainGraph()">Load</button>
+<div style="text-align: center">
+    <h2>Evolution du prix de l'essence en moyenne en france</h2>
+    <div id="containerMainGraph"></div>
 </div>
-<div id="containerCarGraph"></div>
+
+<div style="text-align: center">
+    <h2 >Prix pour 100km pour des modèles de voitures variés</h2>
+    <div id="containerCarGraph"></div>
+</div>
+
 <script src="js/index.js"></script>
 </body>
 </html>
