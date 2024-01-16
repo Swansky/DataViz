@@ -22,6 +22,8 @@ async function main() {
     const data = await computeData();
     await createMainGraph(data);
     await createCarConsoGraph(data);
+    const dataChargingStations = await computeDataChargingStations();
+    await createChargingStationsGraph(dataChargingStations);
 }
 
 async function computeData() {
@@ -37,8 +39,25 @@ async function computeData() {
     });
 }
 
-function createDataForCar(initData) {
+async function computeDataChargingStations() {
+    return await d3.csv("data/Tarifs_recharge_publique.csv", (data) => {
+        let dtMesure = d3.timeParse("%Y-%m")(data.DT_MESURE);
+        const typeRecharge = data.TYPE_RECHARGE;
 
+        if (typeRecharge === "Rapide") {
+            dtMesure.setDate(dtMesure.getDate() + 7);
+        } else if (typeRecharge === "Ultra-Rapide") {
+            dtMesure.setDate(dtMesure.getDate() + 14);
+        }
+
+        return {
+            DT_MESURE: dtMesure,
+            PTTC_HFA: parseFloat(data.PTTC_HFA),
+            TYPE_RECHARGE: typeRecharge
+        };
+    });
+}
+function createDataForCar(initData) {
     let lastPrices = initData[0];
 
     function convertTypeForCsvColumn(type) {
@@ -276,4 +295,108 @@ async function createCarConsoGraph(initData) {
 }
 
 
+async function createChargingStationsGraph(dataChargingStations) {
+
+    // set the dimensions and margins of the graph
+    const margin = { top: 50, right: 30, bottom: 40, left: 150 },
+        width = 800 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    const svg = d3.select("#containerChargingStationsGraph")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right + 200)
+        .attr("height", height + margin.top + margin.bottom + 50)
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    // Add X axis for dates
+    const x = d3.scaleUtc()
+        .domain(d3.extent(dataChargingStations, function (d) { return d.DT_MESURE; }))
+        .range([0, width]);
+    svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x)
+            .ticks(d3.timeMonth.every(1))
+            .tickFormat(d3.timeFormat("%b '%y")))
+        .selectAll("text")
+        .attr("transform", "translate(-10,0)rotate(-45)")
+        .style("text-anchor", "start");
+
+    // Y axis for prices
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(dataChargingStations, function (d) { return d.PTTC_HFA; })])
+        .range([height, 0])
+    svg.append("g")
+        .call(d3.axisLeft(y))
+
+    // Bars add color and value on bars
+    svg.selectAll("myRect")
+        .data(dataChargingStations)
+        .join("rect")
+        .attr("x", (d) => x(d.DT_MESURE))
+        .attr("y", (d) => y(d.PTTC_HFA))
+        .attr("width", 32)
+        .attr("height", (d) => height - y(d.PTTC_HFA))
+        .attr("fill", (d) => d.TYPE_RECHARGE === "Rapide" ? "#82CEEB" : (d.TYPE_RECHARGE === "Ultra-Rapide" ? "#8489EB" : "#84EBC4"));
+
+    // Add text inside bars
+    svg.append("g")
+        .attr("fill", "white")
+        .attr("text-anchor", "middle")
+        .selectAll()
+        .data(dataChargingStations)
+        .join("text")
+        .attr("x", (d) => x(d.DT_MESURE) +15)
+        .attr("y", (d) => y(d.PTTC_HFA) +50)
+        .attr("dy", "0.35em")
+        .attr("dx", -4)
+        .text((d) => d.PTTC_HFA + " € / kWh");
+
+    // rotate each text based on ist actual location
+    svg.selectAll("text").attr("transform", function(d) {
+        return "rotate(-90 " + this.getAttribute("x") + "," + this.getAttribute("y") + ")";
+    });
+
+    // Add a legend
+    const legend = svg.append("g")
+        .attr("class", "legend")
+        .attr("transform", "translate(700, 100)");
+    legend.append("rect")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("fill", "#8489EB");
+    legend.append("text")
+        .attr("x", 30)
+        .attr("y", 15)
+        .text("Ultra-Rapide");
+    legend.append("rect")
+        .attr("y", 30)
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("fill", "#82CEEB");
+    legend.append("text")
+        .attr("x", 30)
+        .attr("y", 45)
+        .text("Rapide");
+    legend.append("rect")
+        .attr("y", 60)
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("fill", "#84EBC4");
+    legend.append("text")
+        .attr("x", 30)
+        .attr("y", 75)
+        .text("Normale");
+
+    // add title
+    svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2) - 10)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text("Prix moyen de l'électricité des stations de recharge publiques");
+
+}
 main().catch(console.error);
