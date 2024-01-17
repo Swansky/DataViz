@@ -312,7 +312,10 @@ async function createChargingStationsGraph(dataChargingStations) {
 
 
     const x = d3.scaleUtc()
-        .domain(d3.extent(dataChargingStations, function (d) { return d.DT_MESURE; }))
+        .domain([
+            d3.min(dataChargingStations, function (d) { return d.DT_MESURE; }),
+            d3.timeDay.offset(d3.max(dataChargingStations, function (d) { return d.DT_MESURE; }), 14)
+        ])
         .range([0, width]);
     svg.append("g")
         .attr("transform", `translate(0, ${height})`)
