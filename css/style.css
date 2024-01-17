@@ -94,35 +94,33 @@
   }
   
   
-  .data-viz-background {
-      width: 70%;        /* 70% de la largeur de l'écran */
-      height: 50vh;      /* 50% de la hauteur de l'écran */
-      background-color: #fff; /* Couleur de fond blanche */
-      margin: 0 auto; /* Centrer le conteneur horizontalement */
-      position: absolute; /* Position absolue */
-      top: 50%; /* Déplacer vers le bas de 50% de la hauteur de la fenêtre */
-      left: 50%; /* Déplacer vers le côté de 50% de la largeur de la fenêtre */
-      transform: translate(-50%, -50%); /* Déplacer vers le haut et à gauche de 50% de sa propre hauteur et largeur pour le centrer parfaitement */
-      box-shadow: 0px 20px 40px 0px rgba(0,0,0,0.8); /* Ajoute une ombre légère */
-      border-radius: 15px; /* Optionnel: arrondir les coins */
-      /* Ajoutez z-index si nécessaire pour s'assurer qu'il est au-dessus des autres éléments */
-      z-index: 10;
-    }
-     
-  
-.data-viz-container {
-    width: 50%; 
-    height: 50%; 
+.data-viz-background {
+  width: 80%;
+  height: 60vh;
+  background-color: #fff;
+  margin: 0 auto;
+  display: flex; /* Ajouté pour flexbox */
+  justify-content: center; /* Centrer horizontalement dans le conteneur */
+  align-items: center; /* Centrer verticalement dans le conteneur */
+  border-radius: 15px;
+  box-shadow: 0px 20px 40px 0px rgba(0,0,0,0.8);
+  z-index: 10;
 }
 
 .data-viz-container {
-    position: relative;
+  width: 50%; /* Ajusté pour occuper tout l'espace disponible */
+  height: 50%; /* Ajusté pour occuper tout l'espace disponible */
+  position: center; /* Garde la position relative */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -40%); /* Centrer horizontalement et verticalement dans le conteneur */
 }
 
 .graph {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, 0%); /* Centrer le graphique dans le conteneur */
     opacity: 0;
     transition: opacity 0.5s;
 }
@@ -130,5 +128,4 @@
 .graph.active {
     opacity: 1;
 }
-
   

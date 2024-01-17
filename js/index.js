@@ -110,16 +110,26 @@ async function createMainGraph(data) {
 
     const svg = d3.create("svg")
         .attr("width", width +120)
-        .attr("height", height);
+        .attr("height", height) ;
 
     svg.append("g")
         .attr("transform", `translate(0,${height - marginBottom})`)
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x))
+        .selectAll("path,line") // Sélectionne les éléments path et line de l'axe X
+        .style("stroke", "black"); // Change la couleur en noir
+
+    svg.selectAll(".tick text") // Sélectionne les éléments de texte dans les ticks de l'axe X
+        .style("fill", "black");
 
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y))
+        .selectAll("path,line") // Sélectionne les éléments path et line de l'axe X
+        .style("stroke", "black"); // Change la couleur en noir
 
+    svg.selectAll(".tick text") // Sélectionne les éléments de texte dans les ticks de l'axe X
+        .style("fill", "black");
+    
     const line_95 = d3.line()
         .x(d => x(d.date))
         .y(d => y(d.prix95E10));
@@ -202,7 +212,10 @@ async function createMainGraph(data) {
             .text(d.label);
     });
 
-    d3.select(".data-viz-container").append(() => svg.node());
+    d3.select(".data-viz-container").html(""); // Effacer les anciens graphiques
+    d3.select(".data-viz-container").node().appendChild(svg.node());
+    
+
 }
 
 
@@ -216,24 +229,25 @@ async function createCarConsoGraph(initData) {
         height = 400 - margin.top - margin.bottom;
 
 
-    const svg = d3.select("#containerCarGraph")
-        .append("svg")
-        .attr("width", 900)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
+    const svg = d3.create("svg").attr("width", 900).attr("height", 400);
+        console.log("SVG Node:", svg.node());
+    
     const x = d3.scaleLinear()
         .domain([0, d3.max(data, function (d) {
             return d.priceFor100Km;
         })])
         .range([0, width]);
+    
+    const xAxis = d3.axisBottom(x);
     svg.append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
+       .attr("transform", `translate(0, ${height})`)
+        .call(xAxis)
+        .selectAll("path,line,Text")
+        .style("stroke", "black");
+    
+     svg.selectAll(".tick text")
+            .style("fill", "black");
+    
     const format = x.tickFormat(20, ".2f");
 
 
@@ -294,6 +308,8 @@ async function createCarConsoGraph(initData) {
             .attr("dy", ".35em")
             .text(d.price + " €");
     });
+    d3.select(".data-viz-container").html(""); // Effacer les anciens graphiques
+    d3.select(".data-viz-container").node().appendChild(svg.node());
 
 }
 
@@ -306,12 +322,10 @@ async function createChargingStationsGraph(dataChargingStations) {
         height = 400 - margin.top - margin.bottom;
 
 
-    const svg = d3.select("#containerChargingStationsGraph")
-        .append("svg")
+    // Créer l'élément SVG et stocker dans une variable
+    const svg = d3.create("svg")
         .attr("width", width + margin.left + margin.right + 200)
-        .attr("height", height + margin.top + margin.bottom + 50)
-        .append("g")
-        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+        .attr("height", height + margin.top + margin.bottom);
 
 
     const x = d3.scaleUtc()
@@ -360,9 +374,13 @@ async function createChargingStationsGraph(dataChargingStations) {
         .text((d) => d.PTTC_HFA + " € / kWh");
 
 
+    // Après avoir positionné les éléments <text>
     svg.selectAll("text").attr("transform", function(d) {
-        return "rotate(-90 " + this.getAttribute("x") + "," + this.getAttribute("y") + ")";
+        let x = this.getAttribute("x") || 0; // Utiliser 0 si x est null
+        let y = this.getAttribute("y") || 0; // Utiliser 0 si y est null
+        return "rotate(-90 " + x + "," + y + ")";
     });
+        
 
 
     const legend = svg.append("g")
@@ -394,36 +412,31 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("x", 30)
         .attr("y", 75)
         .text("Normale");
+        
+        d3.select(".data-viz-container").html(""); // Effacer les anciens graphiques
+        d3.select(".data-viz-container").node().appendChild(svg.node());    
+        console.log("SVG ajouté au conteneur");
+
 }
 
 async function main() {
     const data = await computeData();
     const dataChargingStations = await computeDataChargingStations();
+    console.log("Données des stations de recharge:", dataChargingStations);
 
-    const graphFunctions = [
-        () => createMainGraph(data),
-        () => createCarConsoGraph(data),
-        () => createChargingStationsGraph(dataChargingStations)
-    ];
+    // Fonction pour dormir (delay)
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    let currentGraphIndex = 0;
+    while (true) {
+        await createMainGraph(data);
+        await sleep(5000); // Attendre 5 secondes
 
-    function showGraph(index) {
-        // Effacez tous les graphiques précédents
-        d3.select(".data-viz-container").selectAll("*").remove();
+        await createCarConsoGraph(data);
+        await sleep(5000); // Attendre 5 secondes
 
-        // Appel de la fonction du graphique actuel
-        graphFunctions[index]();
+        await createChargingStationsGraph(dataChargingStations);
+        await sleep(5000); // Attendre 5 secondes
     }
-
-    // Affichez le premier graphique
-    showGraph(currentGraphIndex);
-
-    // Changez le graphique toutes les 5 secondes
-    setInterval(() => {
-        currentGraphIndex = (currentGraphIndex + 1) % graphFunctions.length;
-        showGraph(currentGraphIndex);
-    }, 5000);
 }
 
 main().catch(console.error);
