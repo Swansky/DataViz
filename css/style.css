@@ -1,0 +1,134 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Baloo 2', cursive;
+  }
+  
+  .container {
+    width: 100%;
+    height: 100vh;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5)), url(images/fond_ecran.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  
+  nav {
+    width: 100%;
+    height: 12vh;
+    background-color: rgba(0, 0, 0, 0.8); /* Augmentez la valeur alpha ici */
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+  }
+  
+  nav .logo {
+    width: 25%;
+    text-align: center;
+    font-size: 18px;
+    text-shadow: 3px 4px 2px black;
+  }
+  
+  nav .menu {
+    width: 40%;
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  nav .menu a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    margin-bottom: 2px;
+    position: relative;
+  }
+  
+  nav .menu a:hover {
+    color: #00fc13;
+  }
+  
+  nav .menu a::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background-color: #b200fc;
+    transition: all 0.3s linear;
+  }
+  
+  nav .menu a:hover::before {
+    width: 100%;
+  }
+  
+  nav .menu a:first-child {
+    color: #00fc13;
+  }
+  
+  main {
+      width: 100%;
+      /* Le main n'a plus besoin d'être aussi haut puisque les boutons ont été retirés */
+      min-height: 44vh; /* Utilisez min-height pour vous assurer que la section s'adapte au contenu */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start; /* Aligner les éléments au début du conteneur */
+      align-items: center;
+      text-align: center;
+      color: #fff;
+  }
+  
+  .title-container {
+      margin-top: 5vh; /* Ajustez cette valeur pour positionner le titre plus haut */
+      /* Autres styles pour le titre ici si nécessaire */
+  }
+  
+  section h3 {
+    font-size: 33px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 1px #000;
+  }
+  
+  
+  .data-viz-background {
+      width: 70%;        /* 70% de la largeur de l'écran */
+      height: 50vh;      /* 50% de la hauteur de l'écran */
+      background-color: #fff; /* Couleur de fond blanche */
+      margin: 0 auto; /* Centrer le conteneur horizontalement */
+      position: absolute; /* Position absolue */
+      top: 50%; /* Déplacer vers le bas de 50% de la hauteur de la fenêtre */
+      left: 50%; /* Déplacer vers le côté de 50% de la largeur de la fenêtre */
+      transform: translate(-50%, -50%); /* Déplacer vers le haut et à gauche de 50% de sa propre hauteur et largeur pour le centrer parfaitement */
+      box-shadow: 0px 20px 40px 0px rgba(0,0,0,0.8); /* Ajoute une ombre légère */
+      border-radius: 15px; /* Optionnel: arrondir les coins */
+      /* Ajoutez z-index si nécessaire pour s'assurer qu'il est au-dessus des autres éléments */
+      z-index: 10;
+    }
+     
+  
+.data-viz-container {
+    width: 50%; 
+    height: 50%; 
+}
+
+.data-viz-container {
+    position: relative;
+}
+
+.graph {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.graph.active {
+    opacity: 1;
+}
+
+  

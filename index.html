@@ -1,33 +1,50 @@
 <!DOCTYPE html>
-<html lang="ENG">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Projet DataViz</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet BI/Data Viz</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://d3js.org/d3.v6.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap" rel="stylesheet">
 </head>
+
 <body>
-<div style="text-align: center;">
-    <div>
-        <h2>Évolution du prix de l'essence en moyenne en France</h2>
-        <div id="containerMainGraph"></div>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav>
+            <div class="logo">
+                <h1> Projet BI/Data Viz </h1>
+            </div>
+            <div class="menu">
+                <a href="#"> Home </a>
+                <a href="#"> About us </a>
+                <a href="#"> Courses </a>
+            </div>
+        </nav>
+        <main>
+                <div class="title-container">
+                    <h1> Evolution des prix </h1>
+                </div>
+                <div class="data-viz-background">
+                    <div class="data-viz-container">
+                        <div id="containerMainGraph" class="graph"></div>
+                        <div id="containerCarGraph" class="graph"></div>
+                        <div id="containerChargingStationsGraph" class="graph"></div>
+                    </div>
+                </div>
+        </main>
+
     </div>
 
-</div>
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/index.js"></script>
 
-<div style="text-align: center; display: flex; flex-direction: row">
-    <div style="text-align: center;">
-        <h2 >Prix pour 100 km mixte pour des modèles de voitures variés</h2>
-        <div id="containerCarGraph"></div>
-    </div>
-
-    <div style="text-align: center;">
-        <H2>Prix moyen de l'électricité des stations de recharge publiques</H2>
-        <div id="containerChargingStationsGraph"></div>
-    </div>
-</div>
-
-
-<script src="js/index.js"></script>
 </body>
+
 </html>

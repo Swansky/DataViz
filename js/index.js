@@ -86,6 +86,8 @@ function createDataForCar(initData) {
 }
 
 async function createMainGraph(data) {
+    const containerMainGraph = d3.select("#containerMainGraph");
+
 
     const width = 900;
     const height = 400;
@@ -200,11 +202,12 @@ async function createMainGraph(data) {
             .text(d.label);
     });
 
-    containerMainGraph.append(svg.node());
+    d3.select(".data-viz-container").append(() => svg.node());
 }
 
 
 async function createCarConsoGraph(initData) {
+    const containerCarConsoGraph= d3.select("#containerCarConsoGraph");
     const data = createDataForCar(initData);
     data.sort((a, b) => b.priceFor100Km - a.priceFor100Km);
 
@@ -296,7 +299,7 @@ async function createCarConsoGraph(initData) {
 
 
 async function createChargingStationsGraph(dataChargingStations) {
-
+    const containerChargingStationsGraph = d3.select("#containerChargingStationsGraph");
 
     const margin = { top: 50, right: 30, bottom: 40, left: 150 },
         width = 800 - margin.left - margin.right,
@@ -392,4 +395,35 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("y", 75)
         .text("Normale");
 }
+
+async function main() {
+    const data = await computeData();
+    const dataChargingStations = await computeDataChargingStations();
+
+    const graphFunctions = [
+        () => createMainGraph(data),
+        () => createCarConsoGraph(data),
+        () => createChargingStationsGraph(dataChargingStations)
+    ];
+
+    let currentGraphIndex = 0;
+
+    function showGraph(index) {
+        // Effacez tous les graphiques précédents
+        d3.select(".data-viz-container").selectAll("*").remove();
+
+        // Appel de la fonction du graphique actuel
+        graphFunctions[index]();
+    }
+
+    // Affichez le premier graphique
+    showGraph(currentGraphIndex);
+
+    // Changez le graphique toutes les 5 secondes
+    setInterval(() => {
+        currentGraphIndex = (currentGraphIndex + 1) % graphFunctions.length;
+        showGraph(currentGraphIndex);
+    }, 5000);
+}
+
 main().catch(console.error);
