@@ -391,15 +391,5 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("x", 30)
         .attr("y", 75)
         .text("Normale");
-
-/*
-    svg.append("text")
-        .attr("x", (width / 2))
-        .attr("y", 0 - (margin.top / 2) - 10)
-        .attr("text-anchor", "middle")
-        .style("font-size", "16px")
-        .style("text-decoration", "underline")
-        .text("Prix moyen de l'électricité des stations de recharge publiques"); */
-
 }
 main().catch(console.error);
