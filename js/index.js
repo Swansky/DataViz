@@ -446,15 +446,15 @@ async function main() {
     while (true) {
         document.querySelector('.title-container h1').textContent = 'Évolution du prix de l\'essence en moyenne en France'; // Titre pour le graphique principal
         await createMainGraph(data);
-        await sleep(0); // Attendre 5 secondes
+        await sleep(5000); // Attendre 5 secondes
 
         document.querySelector('.title-container h1').textContent = 'Prix pour 100 km mixte pour des modèles de voitures variés'; // Titre pour le graphique de consommation des voitures
         await createCarConsoGraph(data);
-        await sleep(0); // Attendre 5 secondes
+        await sleep(5000); // Attendre 5 secondes
 
         document.querySelector('.title-container h1').textContent = 'Prix moyen de l\'électricité des stations de recharge publiques'; // Titre pour le graphique des stations de recharge
         await createChargingStationsGraph(dataChargingStations);
-        await sleep(500000); // Attendre 5 secondes
+        await sleep(5000); // Attendre 5 secondes
     }
 }
 
