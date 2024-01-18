@@ -90,7 +90,7 @@ async function createMainGraph(data) {
 
 
     const width = 900;
-    const height = 400;
+    const height = 300;
     const marginTop = 20;
     const marginRight = 20;
     const marginBottom = 30;
@@ -317,8 +317,8 @@ async function createCarConsoGraph(initData) {
 async function createChargingStationsGraph(dataChargingStations) {
     const containerChargingStationsGraph = d3.select("#containerChargingStationsGraph");
 
-    const margin = { top: 50, right: 30, bottom: 40, left: 150 },
-        width = 800 - margin.left - margin.right,
+    const margin = { top: 50, right: 30, bottom: 40, left: 300},
+        width = 1000 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
 
@@ -429,10 +429,10 @@ async function main() {
 
     while (true) {
         await createMainGraph(data);
-        await sleep(5000); // Attendre 5 secondes
+        await sleep(1000); // Attendre 5 secondes
 
         await createCarConsoGraph(data);
-        await sleep(5000); // Attendre 5 secondes
+        await sleep(1000); // Attendre 5 secondes
 
         await createChargingStationsGraph(dataChargingStations);
         await sleep(5000); // Attendre 5 secondes

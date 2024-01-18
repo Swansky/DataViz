@@ -109,11 +109,11 @@
 
 .data-viz-container {
   width: 50%; /* Ajusté pour occuper tout l'espace disponible */
-  height: 50%; /* Ajusté pour occuper tout l'espace disponible */
+  height: 40%; /* Ajusté pour occuper tout l'espace disponible */
   position: center; /* Garde la position relative */
-  left: 50%;
+  left: 70%;
   top: 50%;
-  transform: translate(-50%, -40%); /* Centrer horizontalement et verticalement dans le conteneur */
+  transform: translate(-20%, -40%); /* Centrer horizontalement et verticalement dans le conteneur */
 }
 
 .graph {
