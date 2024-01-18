@@ -90,11 +90,11 @@ async function createMainGraph(data) {
 
 
     const width = 900;
-    const height = 300;
+    const height = 350;
     const marginTop = 20;
-    const marginRight = 20;
+    const marginRight = 30;
     const marginBottom = 30;
-    const marginLeft = 60;
+    const marginLeft = 30;
 
 
 
@@ -224,12 +224,12 @@ async function createCarConsoGraph(initData) {
     const data = createDataForCar(initData);
     data.sort((a, b) => b.priceFor100Km - a.priceFor100Km);
 
-    const margin = {top: 20, right: 30, bottom: 40, left: 170},
+    const margin = {top: 20, right: 50, bottom: 40, left: 30},
         width = 700 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
 
-    const svg = d3.create("svg").attr("width", 900).attr("height", 400);
+    const svg = d3.create("svg").attr("width", 1100).attr("height", 400);
         console.log("SVG Node:", svg.node());
     
     const x = d3.scaleLinear()
@@ -268,7 +268,7 @@ async function createCarConsoGraph(initData) {
         .attr("fill", "#82CEEB");
 
     svg.append("g")
-        .attr("fill", "white")
+        .attr("fill", "black")
         .attr("text-anchor", "end")
         .selectAll()
         .data(data)
@@ -281,7 +281,7 @@ async function createCarConsoGraph(initData) {
 
     let legend = svg.append("g")
         .attr("class", "legend")
-        .attr("transform", "translate(530, 100)");
+        .attr("transform", "translate(850, 100)");
     let lastData = initData[0];
     let legendData = [
         {label: "95E10", price: lastData.prix95E10},
@@ -317,7 +317,7 @@ async function createCarConsoGraph(initData) {
 async function createChargingStationsGraph(dataChargingStations) {
     const containerChargingStationsGraph = d3.select("#containerChargingStationsGraph");
 
-    const margin = { top: 50, right: 30, bottom: 40, left: 300},
+    const margin = { top: 50, right: 30, bottom: 40, left: 200},
         width = 1000 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
@@ -361,8 +361,29 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("fill", (d) => d.TYPE_RECHARGE === "Rapide" ? "#82CEEB" : (d.TYPE_RECHARGE === "Ultra-Rapide" ? "#8489EB" : "#84EBC4"));
 
 
+        // Axe X
     svg.append("g")
-        .attr("fill", "white")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll("path, line")
+        .style("stroke", "black"); // Définit la couleur des lignes et chemins en noir
+
+    svg.selectAll(".tick text")
+        .style("fill", "black"); // Définit la couleur du texte en noir
+
+// Axe Y
+    svg.append("g")
+        .call(d3.axisLeft(y))
+        .selectAll("path, line")
+        .style("stroke", "black"); // Définit la couleur des lignes et chemins en noir
+
+    svg.selectAll(".tick text")
+        .style("fill", "black"); // Définit la couleur du texte en noir
+
+
+
+    svg.append("g")
+        .attr("fill", "black")
         .attr("text-anchor", "middle")
         .selectAll()
         .data(dataChargingStations)
@@ -385,7 +406,7 @@ async function createChargingStationsGraph(dataChargingStations) {
 
     const legend = svg.append("g")
         .attr("class", "legend")
-        .attr("transform", "translate(700, 100)");
+        .attr("transform", "translate(850, 100)");
     legend.append("rect")
         .attr("width", 20)
         .attr("height", 20)
@@ -422,18 +443,20 @@ async function createChargingStationsGraph(dataChargingStations) {
 async function main() {
     const data = await computeData();
     const dataChargingStations = await computeDataChargingStations();
-    console.log("Données des stations de recharge:", dataChargingStations);
 
     // Fonction pour dormir (delay)
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     while (true) {
+        document.querySelector('.title-container h1').textContent = 'Évolution du prix de l\'essence en moyenne en France'; // Titre pour le graphique principal
         await createMainGraph(data);
-        await sleep(1000); // Attendre 5 secondes
+        await sleep(5000); // Attendre 5 secondes
 
+        document.querySelector('.title-container h1').textContent = 'Prix pour 100 km mixte pour des modèles de voitures variés'; // Titre pour le graphique de consommation des voitures
         await createCarConsoGraph(data);
-        await sleep(1000); // Attendre 5 secondes
+        await sleep(5000); // Attendre 5 secondes
 
+        document.querySelector('.title-container h1').textContent = 'Prix moyen de l\'électricité des stations de recharge publiques'; // Titre pour le graphique des stations de recharge
         await createChargingStationsGraph(dataChargingStations);
         await sleep(5000); // Attendre 5 secondes
     }

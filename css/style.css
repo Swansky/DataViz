@@ -95,7 +95,7 @@
   
   
 .data-viz-background {
-  width: 80%;
+  width: 90%;
   height: 60vh;
   background-color: #fff;
   margin: 0 auto;
@@ -111,9 +111,9 @@
   width: 50%; /* Ajusté pour occuper tout l'espace disponible */
   height: 40%; /* Ajusté pour occuper tout l'espace disponible */
   position: center; /* Garde la position relative */
-  left: 70%;
+  left: 50%;
   top: 50%;
-  transform: translate(-20%, -40%); /* Centrer horizontalement et verticalement dans le conteneur */
+  transform: translate(-30%, -50%); /* Centrer horizontalement et verticalement dans le conteneur */
 }
 
 .graph {
