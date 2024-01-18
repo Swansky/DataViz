@@ -334,8 +334,10 @@ async function createChargingStationsGraph(dataChargingStations) {
             d3.timeDay.offset(d3.max(dataChargingStations, function (d) { return d.DT_MESURE; }), 14)
         ])
         .range([0, width]);
+    
+        const yAxisOffset = 50;
     svg.append("g")
-        .attr("transform", `translate(0, ${height})`)
+        .attr("transform", `translate(0, ${height + yAxisOffset})`)
         .call(d3.axisBottom(x)
             .ticks(d3.timeMonth.every(1))
             .tickFormat(d3.timeFormat("%b '%y")))
@@ -361,13 +363,7 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("fill", (d) => d.TYPE_RECHARGE === "Rapide" ? "#82CEEB" : (d.TYPE_RECHARGE === "Ultra-Rapide" ? "#8489EB" : "#84EBC4"));
 
 
-        // Axe X
-    svg.append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x))
-        .selectAll("path, line")
-        .style("stroke", "black"); // Définit la couleur des lignes et chemins en noir
-
+// Définit la couleur des lignes et chemins en noir
     svg.selectAll(".tick text")
         .style("fill", "black"); // Définit la couleur du texte en noir
 
@@ -450,15 +446,15 @@ async function main() {
     while (true) {
         document.querySelector('.title-container h1').textContent = 'Évolution du prix de l\'essence en moyenne en France'; // Titre pour le graphique principal
         await createMainGraph(data);
-        await sleep(5000); // Attendre 5 secondes
+        await sleep(0); // Attendre 5 secondes
 
         document.querySelector('.title-container h1').textContent = 'Prix pour 100 km mixte pour des modèles de voitures variés'; // Titre pour le graphique de consommation des voitures
         await createCarConsoGraph(data);
-        await sleep(5000); // Attendre 5 secondes
+        await sleep(0); // Attendre 5 secondes
 
         document.querySelector('.title-container h1').textContent = 'Prix moyen de l\'électricité des stations de recharge publiques'; // Titre pour le graphique des stations de recharge
         await createChargingStationsGraph(dataChargingStations);
-        await sleep(5000); // Attendre 5 secondes
+        await sleep(500000); // Attendre 5 secondes
     }
 }
 

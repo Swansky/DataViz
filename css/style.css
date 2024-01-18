@@ -16,7 +16,7 @@
   nav {
     width: 100%;
     height: 12vh;
-    background-color: rgba(0, 0, 0, 0.8); /* Augmentez la valeur alpha ici */
+    background-color: rgba(0, 0, 0, 0.8); 
     color: #fff;
     display: flex;
     justify-content: space-between;
@@ -119,7 +119,7 @@
 .graph {
     position: absolute;
     top: 60%;
-    left: 50%;
+    left: 0%;
     transform: translate(-50%, 0%); /* Centrer le graphique dans le conteneur */
     opacity: 0;
     transition: opacity 0.5s;
