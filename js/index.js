@@ -19,16 +19,16 @@ const carStats = [
 ]
 
 async function main() {
-    const data = await computeData();
-    await createMainGraph(data);
-    await createCarConsoGraph(data);
-    const dataChargingStations = await computeDataChargingStations();
-    await createChargingStationsGraph(dataChargingStations);
+    const data = await computeData(); // On charge les données de prix
+    await createMainGraph(data); // On crée le graphique principal
+    await createCarConsoGraph(data); // On crée le graphique de consommation des voitures
+    const dataChargingStations = await computeDataChargingStations(); // On charge les données de prix des stations de recharge 
+    await createChargingStationsGraph(dataChargingStations); // On crée le graphique des stations de recharge
 }
 
-async function computeData() {
+async function computeData() { // On charge les données de prix a partir d'un .csv avec D3
     return await d3.csv("data/global_prices.csv", (data) => {
-        return {
+        return { // On retourne un objet avec les données formatées
             date: d3.timeParse("%Y-%m")(data.date),
             prix95E10: parseFloat(data.prix95E10),
             prix98: parseFloat(data.prix98E10),
@@ -39,25 +39,25 @@ async function computeData() {
     });
 }
 
-async function computeDataChargingStations() {
-    return await d3.csv("data/Tarifs_recharge_publique.csv", (data) => {
+async function computeDataChargingStations() { // On charge les données de prix des stations de recharge a partir d'un .csv avec D3
+    return await d3.csv("data/Tarifs_recharge_publique.csv", (data) => { 
         let dtMesure = d3.timeParse("%Y-%m")(data.DT_MESURE);
         const typeRecharge = data.TYPE_RECHARGE;
 
-        if (typeRecharge === "Rapide") {
+        if (typeRecharge === "Rapide") { // On ajoute 7 jours si c'est une recharge rapide pour décaler les barres
             dtMesure.setDate(dtMesure.getDate() + 7);
-        } else if (typeRecharge === "Ultra-Rapide") {
+        } else if (typeRecharge === "Ultra-Rapide") { // On ajoute 14 jours si c'est une recharge ultra-rapide pour décaler les barres
             dtMesure.setDate(dtMesure.getDate() + 14);
         }
 
-        return {
+        return { // On retourne un objet avec les données formatées
             DT_MESURE: dtMesure,
             PTTC_HFA: parseFloat(data.PTTC_HFA),
             TYPE_RECHARGE: typeRecharge
         };
     });
 }
-function createDataForCar(initData) {
+function createDataForCar(initData) { // On crée les données pour le graphique de consommation des voitures
     let lastPrices = initData[0];
 
     function convertTypeForCsvColumn(type) {
@@ -77,7 +77,7 @@ function createDataForCar(initData) {
         }
     }
 
-    return carStats.map((d) => {
+    return carStats.map((d) => { // On crée un objet avec le nom de la voiture et le carburant correspondant
         return {
             name: d.name + " (" + d.type + ")",
             priceFor100Km: d.conso * lastPrices[convertTypeForCsvColumn(d.type)],
@@ -85,9 +85,8 @@ function createDataForCar(initData) {
     });
 }
 
-async function createMainGraph(data) {
+async function createMainGraph(data) { // On crée le graphique principal
     const containerMainGraph = d3.select("#containerMainGraph");
-
 
     const width = 900;
     const height = 350;
@@ -96,23 +95,21 @@ async function createMainGraph(data) {
     const marginBottom = 30;
     const marginLeft = 30;
 
-
-
-    const x = d3.scaleUtc()
+    const x = d3.scaleUtc() // On crée l'axe X
         .domain([data[data.length - 1].date, data[0].date])
         .range([marginLeft, width - marginRight]);
 
 
-    const y = d3.scaleLinear()
+    const y = d3.scaleLinear() // On crée l'axe Y
         .domain([0, data.reduce((max, d) => Math.max(max, d.prix95E10, d.prix98, d.prixGazole, d.prixElec), 0)])
         .range([height - marginBottom, marginTop]);
 
-
+    
     const svg = d3.create("svg")
         .attr("width", width +120)
         .attr("height", height) ;
 
-    svg.append("g")
+    svg.append("g") // On dessine l'axe X
         .attr("transform", `translate(0,${height - marginBottom})`)
         .call(d3.axisBottom(x))
         .selectAll("path,line") // Sélectionne les éléments path et line de l'axe X
@@ -121,7 +118,7 @@ async function createMainGraph(data) {
     svg.selectAll(".tick text") // Sélectionne les éléments de texte dans les ticks de l'axe X
         .style("fill", "black");
 
-    svg.append("g")
+    svg.append("g") // On dessine l'axe Y
         .attr("transform", `translate(${marginLeft},0)`)
         .call(d3.axisLeft(y))
         .selectAll("path,line") // Sélectionne les éléments path et line de l'axe X
@@ -130,6 +127,7 @@ async function createMainGraph(data) {
     svg.selectAll(".tick text") // Sélectionne les éléments de texte dans les ticks de l'axe X
         .style("fill", "black");
     
+    // On crée les lignes
     const line_95 = d3.line()
         .x(d => x(d.date))
         .y(d => y(d.prix95E10));
@@ -150,7 +148,7 @@ async function createMainGraph(data) {
         .x(d => x(d.date))
         .y(d => y(d.prixE85));
 
-
+    // On crée le texte de la légende
     let legendData = [
         {label: "95E10", color: "#5DABEB"},
         {label: "98E10", color: "#82CEEB"},
@@ -159,7 +157,7 @@ async function createMainGraph(data) {
         {label: "E85", color: "#81EBC3"}
     ];
 
-
+    // On dessine les lignes
     svg.append("path")
         .attr("fill", "none")
         .attr("stroke", "#5DABEB")
@@ -191,10 +189,10 @@ async function createMainGraph(data) {
         .attr("d", line_E85(data));
 
 
+    // On dessine la légende
     let legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", "translate(900, 1)");
-
 
     legendData.forEach(function (d, i) {
         let legendItem = legend.append("g")
@@ -213,32 +211,33 @@ async function createMainGraph(data) {
     });
 
     d3.select(".data-viz-container").html(""); // Effacer les anciens graphiques
-    d3.select(".data-viz-container").node().appendChild(svg.node());
-    
-
+    d3.select(".data-viz-container").node().appendChild(svg.node()); // Ajouter le graphique au conteneur
 }
 
 
-async function createCarConsoGraph(initData) {
-    const containerCarConsoGraph= d3.select("#containerCarConsoGraph");
-    const data = createDataForCar(initData);
-    data.sort((a, b) => b.priceFor100Km - a.priceFor100Km);
+async function createCarConsoGraph(initData) { // On crée le graphique de consommation des voitures
+    const containerCarConsoGraph= d3.select("#containerCarConsoGraph"); // On sélectionne le conteneur
+    const data = createDataForCar(initData); // On crée les données pour le graphique de consommation des voitures
 
-    const margin = {top: 20, right: 50, bottom: 40, left: 30},
+    data.sort((a, b) => b.priceFor100Km - a.priceFor100Km); // On trie les données par prix décroissant
+
+    const margin = {top: 20, right: 50, bottom: 40, left: 30}, // On définit les marges du graphe
         width = 700 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
 
-    const svg = d3.create("svg").attr("width", 1100).attr("height", 400);
+    const svg = d3.create("svg").attr("width", 1100).attr("height", 400); // On crée l'élément SVG 
         console.log("SVG Node:", svg.node());
     
-    const x = d3.scaleLinear()
+    // On crée l'axe X
+    const x = d3.scaleLinear() 
         .domain([0, d3.max(data, function (d) {
             return d.priceFor100Km;
         })])
         .range([0, width]);
     
     const xAxis = d3.axisBottom(x);
+    // On dessine l'axe X
     svg.append("g")
        .attr("transform", `translate(0, ${height})`)
         .call(xAxis)
@@ -250,7 +249,7 @@ async function createCarConsoGraph(initData) {
     
     const format = x.tickFormat(20, ".2f");
 
-
+    // On crée l'axe Y et on le dessine
     const y = d3.scaleBand()
         .range([0, height])
         .domain(data.map(d => d.name))
@@ -258,6 +257,7 @@ async function createCarConsoGraph(initData) {
     svg.append("g")
         .call(d3.axisLeft(y))
 
+    // On dessine les barres
     svg.selectAll("myRect")
         .data(data)
         .join("rect")
@@ -267,6 +267,7 @@ async function createCarConsoGraph(initData) {
         .attr("height", y.bandwidth())
         .attr("fill", "#82CEEB");
 
+    // On dessine les textes dans les barres
     svg.append("g")
         .attr("fill", "black")
         .attr("text-anchor", "end")
@@ -279,6 +280,7 @@ async function createCarConsoGraph(initData) {
         .attr("dx", -4)
         .text((d) => format(d.priceFor100Km) + " €");
 
+    // On crée la légende
     let legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", "translate(850, 100)");
@@ -292,7 +294,7 @@ async function createCarConsoGraph(initData) {
 
     ];
 
-
+    // On dessine la légende
     legendData.forEach(function (d, i) {
         let legendItem = legend.append("g")
             .attr("transform", `translate(0, ${i * 30})`);
@@ -309,15 +311,15 @@ async function createCarConsoGraph(initData) {
             .text(d.price + " €");
     });
     d3.select(".data-viz-container").html(""); // Effacer les anciens graphiques
-    d3.select(".data-viz-container").node().appendChild(svg.node());
+    d3.select(".data-viz-container").node().appendChild(svg.node()); // Ajouter le graphique au conteneur
 
 }
 
 
-async function createChargingStationsGraph(dataChargingStations) {
+async function createChargingStationsGraph(dataChargingStations) { // On crée le graphique des stations de recharge
     const containerChargingStationsGraph = d3.select("#containerChargingStationsGraph");
 
-    const margin = { top: 50, right: 30, bottom: 40, left: 200},
+    const margin = { top: 50, right: 30, bottom: 40, left: 200}, // On définit les marges du graphe
         width = 1000 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
@@ -328,7 +330,7 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("height", height + margin.top + margin.bottom);
 
 
-    const x = d3.scaleUtc()
+    const x = d3.scaleUtc() // On crée l'axe X
         .domain([
             d3.min(dataChargingStations, function (d) { return d.DT_MESURE; }),
             d3.timeDay.offset(d3.max(dataChargingStations, function (d) { return d.DT_MESURE; }), 14)
@@ -336,7 +338,7 @@ async function createChargingStationsGraph(dataChargingStations) {
         .range([0, width]);
     
         const yAxisOffset = 50;
-    svg.append("g")
+    svg.append("g") // On dessine l'axe X
         .attr("transform", `translate(0, ${height + yAxisOffset})`)
         .call(d3.axisBottom(x)
             .ticks(d3.timeMonth.every(1))
@@ -346,14 +348,14 @@ async function createChargingStationsGraph(dataChargingStations) {
         .style("text-anchor", "start");
 
 
-    const y = d3.scaleLinear()
+    const y = d3.scaleLinear() // On crée l'axe Y
         .domain([0, d3.max(dataChargingStations, function (d) { return d.PTTC_HFA; })])
         .range([height, 0])
-    svg.append("g")
+    svg.append("g") // On dessine l'axe Y
         .call(d3.axisLeft(y))
 
 
-    svg.selectAll("myRect")
+    svg.selectAll("myRect") // On dessine les barres
         .data(dataChargingStations)
         .join("rect")
         .attr("x", (d) => x(d.DT_MESURE))
@@ -363,11 +365,10 @@ async function createChargingStationsGraph(dataChargingStations) {
         .attr("fill", (d) => d.TYPE_RECHARGE === "Rapide" ? "#82CEEB" : (d.TYPE_RECHARGE === "Ultra-Rapide" ? "#8489EB" : "#84EBC4"));
 
 
-// Définit la couleur des lignes et chemins en noir
+// Définit la couleur des lignes des axes en noir
     svg.selectAll(".tick text")
         .style("fill", "black"); // Définit la couleur du texte en noir
 
-// Axe Y
     svg.append("g")
         .call(d3.axisLeft(y))
         .selectAll("path, line")
@@ -376,8 +377,7 @@ async function createChargingStationsGraph(dataChargingStations) {
     svg.selectAll(".tick text")
         .style("fill", "black"); // Définit la couleur du texte en noir
 
-
-
+    // On dessine les textes dans les barres
     svg.append("g")
         .attr("fill", "black")
         .attr("text-anchor", "middle")
@@ -391,15 +391,14 @@ async function createChargingStationsGraph(dataChargingStations) {
         .text((d) => d.PTTC_HFA + " € / kWh");
 
 
-    // Après avoir positionné les éléments <text>
+    // On transforme le texte pour l'afficher à la verticale
     svg.selectAll("text").attr("transform", function(d) {
         let x = this.getAttribute("x") || 0; // Utiliser 0 si x est null
         let y = this.getAttribute("y") || 0; // Utiliser 0 si y est null
         return "rotate(-90 " + x + "," + y + ")";
     });
         
-
-
+    // On crée la légende et on la dessine
     const legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", "translate(850, 100)");
@@ -431,19 +430,20 @@ async function createChargingStationsGraph(dataChargingStations) {
         .text("Normale");
         
         d3.select(".data-viz-container").html(""); // Effacer les anciens graphiques
-        d3.select(".data-viz-container").node().appendChild(svg.node());    
+        d3.select(".data-viz-container").node().appendChild(svg.node()); // Ajouter le graphique au conteneur
         console.log("SVG ajouté au conteneur");
 
 }
 
-async function main() {
-    const data = await computeData();
-    const dataChargingStations = await computeDataChargingStations();
+async function main() { // Fonction principale
+    const data = await computeData(); // On charge les données de prix
+    const dataChargingStations = await computeDataChargingStations(); // On charge les données de prix des stations de recharge
 
     // Fonction pour dormir (delay)
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    while (true) {
+    // Code pour la fonction JS "Carrousel"
+    while (true) { // Boucle infinie pour répéter l'effet
         document.querySelector('.title-container h1').textContent = 'Évolution du prix de l\'essence en moyenne en France'; // Titre pour le graphique principal
         await createMainGraph(data);
         await sleep(5000); // Attendre 5 secondes
@@ -458,4 +458,4 @@ async function main() {
     }
 }
 
-main().catch(console.error);
+main().catch(console.error); // Lancer la fonction principale
